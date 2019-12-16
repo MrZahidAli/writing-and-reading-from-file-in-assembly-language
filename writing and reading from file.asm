@@ -12,30 +12,29 @@ main PROC
 	
 	mov edx,OFFSET filename
 	
-	call CreateOutputFile	;	Or OpenInputFile
+	call CreateOutputFile	;Or OpenInputFile
 
-	mov fileHandler, eax	;	File Handler
-	mov edx, offset msg		;	Msg to be read/write
-	mov ecx, sizeof msg		;	Size of the Msg
-	Call WriteToFile
-	mov eax, fileHandler
-	Call closefile
+	mov fileHandler, eax	;File Handler from eax to fileHandler
+	mov edx, offset msg	;Msg to be read/write
+	mov ecx, sizeof msg	;Size of the Msg
+	Call WriteToFile	;writing to file
+	mov eax, fileHandler	;after writing to file moving filehandler to eax again 
+	Call closefile		;after moving file handler into eax closing file
 
 
-	mov edx, offset filename
-	call OpenInputFile
+	mov edx, offset filename	;mov offset of file name wna read
+	call OpenInputFile		;open file
 	
 	mov edx, offset msg1	;to save data from file into msg1
-	mov ecx, sizeof msg1	;..
-	Call ReadFromFile
+	mov ecx, sizeof msg1	;size of data wana read
+	Call ReadFromFile	;reading from file
 
-	mov edx, offset msg1
-	call WriteString
+	mov edx, offset msg1	;for printing moving offset of msg1
+	call WriteString	;printing string values
 
-
-
-
-	call readInt
+	call crlf		;new line
+	call crlf
+	call waitmsg		;wait message
 	exit
 main ENDP
 END main
