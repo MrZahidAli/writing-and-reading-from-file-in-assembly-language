@@ -11,7 +11,7 @@ msg1 dword 13 dup(?)
 
 
 
-PRICES   dword 169, 149, 99, 89, 69, 69, 10, 5                   
+PRICES   dword 70,120,90,100,60,50,10,30                 
 bill     dword ?                                                 
 bool     dword ?                                                  
 Start  BYTE "                              "
@@ -79,13 +79,13 @@ main PROC
 
 
   
-	 mov edx, OFFSET Start                                      ; Printing Welcome...
+	 mov edx, OFFSET Start                                    
 	 call writeString
 
      op:
 	    call crlf
 
-	    mov edx, OFFSET entering                                       ; Printing Id...
+	    mov edx, OFFSET entering                                       
 		call writeString
 
 		call crlf
@@ -98,7 +98,7 @@ main PROC
 		cmp eax, 2
 		je  _exit
 
-		call errorHandling                                                ; calling error Proc...
+		call errorHandling                                                
 		jmp  op
 
 
@@ -108,26 +108,21 @@ main PROC
 		   jmp op
 
 	 _exit:
-		   mov edx, OFFSET Final                                ; Printing Exit Note/Msg...
+		   mov edx, OFFSET Final                                
 	       call writeString
 
 	       exit
 main ENDP
 
-;-------------------------------------------------------------------
-;| For customers only...                                            |
-;| Uses: It deals with the customers and take order...              |
-;| Note: It only write bill in file with (False) customer name...   |
-;-------------------------------------------------------------------
-
+;For user to Enter the billing environment or exit
 User PROC
           PUSHAD
 		  PUSHFD
 
-	      op:                                                     ; Option Tag...  
+	      op:                                                      
 		     call crlf
 
-			 mov edx, OFFSET options                              ; Printing options...
+			 mov edx, OFFSET options                            
 	         call writeString
 
 			 call crlf
@@ -141,10 +136,10 @@ User PROC
 			 cmp eax, 3
 			 je  _exit
 
-			 call errorHandling                                            ; calling error Proc...
+			 call errorHandling                                            
 			 jmp  op
 
-			 pm:                                                  ; Price Menu Tag...
+			 pm:                                                  
 			    call crlf
 
 		        mov edx, OFFSET Selection2
@@ -152,13 +147,13 @@ User PROC
 
 				jmp  op
 
-			 cm:                                                  ; Choice Menu Tag...				
+			 cm:                                                  				
 				call MenuItems
 				jmp op
 
 
 
-    _exit:                                                        ; Exit Tag
+    _exit:                                                        
 		  call finalBill
 		  mov bill, 0
 		  call crlf
@@ -169,16 +164,13 @@ User PROC
 		  RET
 User ENDP
 
-;-------------------------------------------------------------------
-;| Print Oriental Menu with Prices for customers to order...        |
-;| Updates: Bill ...                                                |
-;-------------------------------------------------------------------
-
-MenuItems PROC
+;To show Food Items alomng with prices for user
+; to Select the items of h.
+Menuitems PROC
 			  PUSHAD
 			  PUSHFD
 
-			  op:                                                 ; Option Tag...
+			  op:                                                 
 			     call crlf
 
 		         mov edx, OFFSET Selection
@@ -206,108 +198,107 @@ MenuItems PROC
 				 cmp eax, 9
 				 je  _exit
 
-		         call errorHandling                                        ; calling error Proc...
+		         call errorHandling                                        
 		         jmp  op
 
-		         cq:                                              ; Chicken Quorma Tag...
+		         cq:                                              
 		            mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
-
+				    call readInt                                 
   				    mov ebx, [PRICES]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                      
 				    add eax, bill
 				    mov bill, eax
 
 		            jmp  op
 
-                 pu:                                              ; Pullao Tag...
+                 pu:                                             
 	                mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
+				    call readInt                                 
 
 				    mov ebx, [PRICES + 4]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                       
 				    add eax, bill
 				    mov bill, eax
 
 		            jmp  op
 
-                 cb:                                              ; Chicken Briyani Tag...
+                 cb:                                              
 	                mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
+				    call readInt                                 
 
 				    mov ebx, [PRICES + 8]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                      
 				    add eax, bill
 				    mov bill, eax
 
 		            jmp  op
 
-                 ck:                                              ; Chicken Karahi Tag...
+                 ck:                                              
 		            mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
+				    call readInt                                  ; Taking input for Quantity of a Specific item
 
 				    mov ebx, [PRICES + 12]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                       
 				    add eax, bill
 				    mov bill, eax
 
 		            jmp  op
 
-		         ct:                                              ; Chicken Tikka Tag...
+		         ct:                                              
 	                mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
+				    call readInt                                
 
 				    mov ebx, [PRICES + 16]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                      
 				    add eax, bill
 				    mov bill, eax
 
 		            jmp  op
 
-			     mh:                                              ; Murgh Haleem Tag...
+			     mh:                                             
 	                mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
+				    call readInt                                  
 
 				    mov ebx, [PRICES + 20]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                       
 				    add eax, bill
 				    mov bill, eax
 
 		            jmp  op
 
-			     na:                                              ; Naan Tag...
+			     na:                                             
 	                mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
+				    call readInt                                
 
 				    mov ebx, [PRICES + 24]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                     
 				    add eax, bill
 				    mov bill, eax
 
 		            jmp  op
 
-			     rt:                                              ; Roti Tag...
+			     rt:                                             
 	                mov edx, OFFSET Quantity
 	                call writeString
 
-				    call readInt                                  ; Taking input for quantity...
+				    call readInt                                  
 
 				    mov ebx, [PRICES + 28]
-				    mul ebx                                       ; Mul quantity with price...
+				    mul ebx                                     
 				    add eax, bill
 				    mov bill, eax
 
@@ -323,9 +314,7 @@ MenuItems ENDP
 
 
 
-;-------------------------------------------------------------------
-;| Uses: Print the bill for Customers...                            |
-;-------------------------------------------------------------------
+;Print Final Bill of User
 
 finalBill PROC
            PUSHAD
@@ -337,7 +326,7 @@ finalBill PROC
 	       call writeString 
 
 		   mov eax, bill
-		   call writeInt                                         ; Print the original bill...
+		   call writeInt                                        
 
 		   
 
@@ -346,7 +335,7 @@ finalBill PROC
 		   call crlf
 		   call crlf
 
-		   mov edx, OFFSET Final                                 ; Printing Exit Note/Msg...
+		   mov edx, OFFSET Final                                 
 	       call writeString
 
 		   POPFD
@@ -356,11 +345,7 @@ finalBill PROC
 	       RET
 finalBill ENDP
 
-;-------------------------------------------------------------------
-;| Shows an Error Box to customers...                               |
-;| Uses:  2 strings for an input   box...                           |
-;| Advan: It also works as a pause...                               |
-;-------------------------------------------------------------------
+;Procedure for Error Handling
 
 errorHandling PROC
        PUSHAD
