@@ -1,51 +1,48 @@
 INCLUDE Irvine32.inc
 
 .DATA
+
 filename BYTE "menueItems.txt",0
 filename2 BYTE "price.txt", 0
+filename3 BYTE "menue.txt", 0
 fileHandler dword ?
 msg1 dword 13 dup(?)
 
 
 
 
+PRICES   dword 169, 149, 99, 89, 69, 69, 10, 5                   
+bill     dword ?                                                 
+bool     dword ?                                                  
+Start  BYTE "                              "
+         BYTE "*************************************",0ah,0dh
+		 BYTE "                              "
+         BYTE "* !!!  Deans Hotel Food Billing !!! *", 0ah, 0dh 
+		 BYTE "                              "
+		 BYTE "*************************************",0ah,0dh,0
+
+entering       BYTE " Enter '1':   ", 0ah, 0dh
+         BYTE "       For Menu and Billing ", 0ah, 0dh
+	     BYTE " Enter '2':  ", 0ah, 0dh
+		 BYTE "       To Exit", 0ah, 0dh,0
 
 
-oPrice   DWORD 169, 149, 99, 89, 69, 69, 10, 5                    ; To store the prices of Oriental...
-bill     DWORD ?                                                  ; To store the bill...
-bool     DWORD ?                                                  ; To store the result of Check... 
+options  BYTE "                                                 <***************> ", 0ah, 0dh, 0ah, 0dh
+         BYTE " Press <1> -> To show available food items.", 0ah, 0dh
+		 BYTE " Press <2> -> For Order.", 0ah, 0dh
+		 BYTE " Press <3> -> To Exit.", 0ah, 0dh , 0
 
-welcome  BYTE "                       "
-         BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
-
-id       BYTE " Enter 2 : For Customers ", 0ah, 0dh
-	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
-
-
-options  BYTE "                        ----------------------  ", 0ah, 0dh
-         BYTE "                        -----  Customer  ----- ", 0ah, 0dh
-         BYTE "                        ---------------------- ", 0ah, 0dh, 0ah, 0dh
-         BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
-		 BYTE " Enter 3 : To Place an Order.", 0ah, 0dh
-		 BYTE " Enter 5 : To Exit.", 0ah, 0dh , 0
-
-		                                                          ; Price Menu...
-pMenu    BYTE "                     ------------------------- ", 0ah, 0dh
-         BYTE "                     -- Presenting our Menu -- ", 0ah, 0dh
-         BYTE "                     ------------------------- ", 0ah, 0dh, 0ah, 0dh
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; changed below
-oriental BYTE 5000 dup(?)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;above
-
+		                                                         
+Selection BYTE 5000 dup(?)
+Selection2 BYTE 5000 dup(?)
 saleFileName BYTE "Sales.txt", 0		;;need for other
 
-dishes   BYTE " Enter the Quantity:  ", 0
+Quantity   BYTE " Enter the Quantity for that item :  ", 0
 
-caption  BYTE " Error ", 0
-billMsg  BYTE "    |Total Bill Is:   Rs ", 0
-errMsg   BYTE " Please Enter Valid Numbber... ", 0
-exitMsg  BYTE "   Glad to have you Here... ", 0ah, 0dh
+caption  BYTE " Invalid Input ", 0
+errMsg   BYTE " Please Enter Valid One... ", 0
+TotalBill  BYTE "     Total Bill for selected items is:   Rs ", 0
+Final  BYTE "   Thanks for coming ", 0ah, 0dh
 
 .CODE
 
@@ -53,35 +50,42 @@ main PROC
 
 	mov edx, offset filename	;mov offset of file name wna read
 	call OpenInputFile		;open file
-	
-	mov edx, offset oriental	;to save data from file into msg1
+	mov edx, offset selection	;to save data from file into msg1
+	mov ecx, 1000	;size of data wana read
+	Call ReadFromFile	;reading from file
+
+	mov edx, offset filename3	;mov offset of file name wna read
+	call OpenInputFile		;open file
+	mov edx, offset selection2	;to save data from file into msg1
 	mov ecx, 1000	;size of data wana read
 	Call ReadFromFile	;reading from file
 
 
-
 	mov edx, offset filename2	;mov offset of file name wna read
 	call OpenInputFile		;open file
-	
 	mov edx, offset msg1	;to save data from file into msg1
 	mov ecx, 5000	;size of data wana read
 	Call ReadFromFile	;reading from file
 
 
 
-	
-     mov eax, cyan
-	 call setTextColor
 
-     call crlf
 
-	 mov edx, OFFSET welcome                                      ; Printing Welcome...
+
+
+
+
+
+
+
+  
+	 mov edx, OFFSET Start                                      ; Printing Welcome...
 	 call writeString
 
      op:
 	    call crlf
 
-	    mov edx, OFFSET id                                        ; Printing Id...
+	    mov edx, OFFSET entering                                       ; Printing Id...
 		call writeString
 
 		call crlf
@@ -89,24 +93,22 @@ main PROC
 		call clrscr
 
 		cmp eax, 1
-		
-		cmp eax, 2
 		je cu
 
-		cmp eax, 3
+		cmp eax, 2
 		je  _exit
 
-		call error                                                ; calling error Proc...
+		call errorHandling                                                ; calling error Proc...
 		jmp  op
 
 
 		    
 		cu:
-		   call customer
+		   call User
 		   jmp op
 
 	 _exit:
-		   mov edx, OFFSET exitMsg                                ; Printing Exit Note/Msg...
+		   mov edx, OFFSET Final                                ; Printing Exit Note/Msg...
 	       call writeString
 
 	       exit
@@ -118,7 +120,7 @@ main ENDP
 ;| Note: It only write bill in file with (False) customer name...   |
 ;-------------------------------------------------------------------
 
-customer PROC
+User PROC
           PUSHAD
 		  PUSHFD
 
@@ -133,35 +135,31 @@ customer PROC
 
 			 cmp eax, 1
 			 je  pm
-			 cmp eax, 3
+			 cmp eax, 2
 			 je  cm
 
-			 cmp eax, 5
+			 cmp eax, 3
 			 je  _exit
 
-			 call error                                           ; calling error Proc...
+			 call errorHandling                                            ; calling error Proc...
 			 jmp  op
 
 			 pm:                                                  ; Price Menu Tag...
 			    call crlf
 
-		        mov edx, OFFSET pMenu
+		        mov edx, OFFSET Selection2
 	            call writeString
-
-			    call crlf
-				call waitMsg                                      ; Call Wait Massage...
-				call crlf
 
 				jmp  op
 
 			 cm:                                                  ; Choice Menu Tag...				
-				call OrientalMenu
+				call MenuItems
 				jmp op
 
 
 
     _exit:                                                        ; Exit Tag
-		  call printBill
+		  call finalBill
 		  mov bill, 0
 		  call crlf
 
@@ -169,21 +167,21 @@ customer PROC
 		  POPAD
 
 		  RET
-customer ENDP
+User ENDP
 
 ;-------------------------------------------------------------------
 ;| Print Oriental Menu with Prices for customers to order...        |
 ;| Updates: Bill ...                                                |
 ;-------------------------------------------------------------------
 
-OrientalMenu PROC
+MenuItems PROC
 			  PUSHAD
 			  PUSHFD
 
 			  op:                                                 ; Option Tag...
 			     call crlf
 
-		         mov edx, OFFSET oriental
+		         mov edx, OFFSET Selection
 	             call writeString
 
 		         call crlf
@@ -208,16 +206,16 @@ OrientalMenu PROC
 				 cmp eax, 9
 				 je  _exit
 
-		         call error                                       ; calling error Proc...
+		         call errorHandling                                        ; calling error Proc...
 		         jmp  op
 
 		         cq:                                              ; Chicken Quorma Tag...
-		            mov edx, OFFSET dishes
+		            mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-  				    mov ebx, [oPrice]
+  				    mov ebx, [PRICES]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -225,12 +223,12 @@ OrientalMenu PROC
 		            jmp  op
 
                  pu:                                              ; Pullao Tag...
-	                mov edx, OFFSET dishes
+	                mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-				    mov ebx, [oPrice + 4]
+				    mov ebx, [PRICES + 4]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -238,12 +236,12 @@ OrientalMenu PROC
 		            jmp  op
 
                  cb:                                              ; Chicken Briyani Tag...
-	                mov edx, OFFSET dishes
+	                mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-				    mov ebx, [oPrice + 8]
+				    mov ebx, [PRICES + 8]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -251,12 +249,12 @@ OrientalMenu PROC
 		            jmp  op
 
                  ck:                                              ; Chicken Karahi Tag...
-		            mov edx, OFFSET dishes
+		            mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-				    mov ebx, [oPrice + 12]
+				    mov ebx, [PRICES + 12]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -264,12 +262,12 @@ OrientalMenu PROC
 		            jmp  op
 
 		         ct:                                              ; Chicken Tikka Tag...
-	                mov edx, OFFSET dishes
+	                mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-				    mov ebx, [oPrice + 16]
+				    mov ebx, [PRICES + 16]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -277,12 +275,12 @@ OrientalMenu PROC
 		            jmp  op
 
 			     mh:                                              ; Murgh Haleem Tag...
-	                mov edx, OFFSET dishes
+	                mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-				    mov ebx, [oPrice + 20]
+				    mov ebx, [PRICES + 20]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -290,12 +288,12 @@ OrientalMenu PROC
 		            jmp  op
 
 			     na:                                              ; Naan Tag...
-	                mov edx, OFFSET dishes
+	                mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-				    mov ebx, [oPrice + 24]
+				    mov ebx, [PRICES + 24]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -303,12 +301,12 @@ OrientalMenu PROC
 		            jmp  op
 
 			     rt:                                              ; Roti Tag...
-	                mov edx, OFFSET dishes
+	                mov edx, OFFSET Quantity
 	                call writeString
 
 				    call readInt                                  ; Taking input for quantity...
 
-				    mov ebx, [oPrice + 28]
+				    mov ebx, [PRICES + 28]
 				    mul ebx                                       ; Mul quantity with price...
 				    add eax, bill
 				    mov bill, eax
@@ -320,7 +318,7 @@ OrientalMenu PROC
 			  POPAD
 
 			  RET
-OrientalMenu ENDP
+MenuItems ENDP
 
 
 
@@ -329,13 +327,13 @@ OrientalMenu ENDP
 ;| Uses: Print the bill for Customers...                            |
 ;-------------------------------------------------------------------
 
-printBill PROC
+finalBill PROC
            PUSHAD
 		   PUSHFD
 
 		   call crlf
 
-		   mov edx, OFFSET billMsg
+		   mov edx, OFFSET TotalBill
 	       call writeString 
 
 		   mov eax, bill
@@ -348,7 +346,7 @@ printBill PROC
 		   call crlf
 		   call crlf
 
-		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
+		   mov edx, OFFSET Final                                 ; Printing Exit Note/Msg...
 	       call writeString
 
 		   POPFD
@@ -356,7 +354,7 @@ printBill PROC
 
 
 	       RET
-printBill ENDP
+finalBill ENDP
 
 ;-------------------------------------------------------------------
 ;| Shows an Error Box to customers...                               |
@@ -364,7 +362,7 @@ printBill ENDP
 ;| Advan: It also works as a pause...                               |
 ;-------------------------------------------------------------------
 
-error PROC
+errorHandling PROC
        PUSHAD
 	   PUSHFD
 
@@ -378,6 +376,6 @@ error PROC
 	   POPAD
 
 	   RET
-error ENDP
+errorHandling  ENDP
 
 END main
